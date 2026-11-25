@@ -22,7 +22,7 @@
     user,
     userWave: waveHead + waveArm,
     userWaveBoard: `${waveArm}<g class="login-board">
-      <rect x="-12.5" y="-8.9" width="25" height="10" rx="2" fill="white" stroke-width="1"/>
+      <rect x="-12.5" y="-8.9" width="25" height="10" rx="2" fill="white" stroke-width="1.8"/>
       <text x="0" y="-1.5" text-anchor="middle" font-size="7.3" textLength="22.5" lengthAdjust="spacingAndGlyphs" fill="currentColor">ログイン</text>
     </g>${waveHead}`,
     cart,
