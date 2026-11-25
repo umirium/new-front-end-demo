@@ -3,12 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <script>
-    if (new URLSearchParams(location.search).get('view') === 'desktop') {
-      document.querySelector('meta[name="viewport"]').content = 'width=1280, viewport-fit=cover';
-      document.documentElement.dataset.desktopPreview = '';
-    }
-  </script>
+
+  <script src="../shared/open-preview.js"></script>
   <title>返礼品を選ぶ｜ふるさと納税</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -358,6 +354,14 @@
   <button type="button" class="preview-toggle" aria-expanded="false" aria-controls="preview-settings" hidden>テーマ設定</button>
   <div id="preview-settings" hidden><div class="preview-palette"></div></div>
   <div data-account-preview-control hidden class="flex flex-wrap items-center gap-2">
+    <label class="flex items-center gap-1">画面表示
+      <select data-preview-mode class="rounded bg-white px-1 py-1 text-black">
+        <option value="auto">自動</option>
+        <option value="desktop">PC</option>
+        <option value="tablet">タブレット</option>
+        <option value="mobile">モバイル</option>
+      </select>
+    </label>
     <label class="flex items-center gap-1">
     ログイン状態
     <select data-account-state class="rounded bg-white px-1 py-1 text-black">

@@ -108,6 +108,11 @@
       const toggle = document.querySelector('.preview-toggle');
       const panel = document.getElementById('preview-settings');
       panel.querySelector('.preview-palette').append(...bar.querySelectorAll(':scope > span, [data-proto-swatch]'));
+      const mode = control.querySelector('[data-preview-mode]');
+      if (mode && window.frameElement && window.parent.devicePreview) {
+        mode.value = window.parent.devicePreview.mode;
+        mode.addEventListener('change', () => window.parent.devicePreview.select(mode.value));
+      }
       panel.append(control);
       bar.append(toggle, panel);
       toggle.addEventListener('click', () => {

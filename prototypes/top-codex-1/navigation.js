@@ -3,22 +3,14 @@
   const bar = document.querySelector('[data-menu-bar]');
   const drawer = document.querySelector('#menu-drawer');
   const drawerToggle = document.querySelector('[data-menu-toggle]');
-  const desktop = matchMedia(document.documentElement.hasAttribute('data-desktop-preview')
-    ? '(min-width: 75rem)'
-    : '(min-width: 75rem) and (not (pointer: coarse))');
+  const desktop = matchMedia('(min-width: 75rem) and (not (pointer: coarse))');
+  const desktopMenu = () => document.documentElement.dataset.layoutMode === 'desktop' || desktop.matches;
   const categories = [...menu.querySelectorAll('[data-category-toggle]')].map((button) => ({
     button,
     label: button.previousElementSibling,
     group: button.parentElement,
     submenu: document.getElementById(button.getAttribute('aria-controls')),
   }));
-  if (document.documentElement.hasAttribute('data-desktop-preview')) {
-    for (const link of document.querySelectorAll('a[href="../municipality-claude/index.html"], a[href="../top-codex-1/index.html"]')) {
-      const url = new URL(link.href);
-      url.searchParams.set('view', 'desktop');
-      link.href = url.href;
-    }
-  }
   let activeCategory = null;
 
   function selectCategory(active) {
@@ -26,13 +18,13 @@
     categories.forEach((category) => {
       const expanded = category === active;
       category.button.setAttribute('aria-expanded', String(expanded));
-      category.submenu.inert = desktop.matches && !expanded;
+      category.submenu.inert = desktopMenu() && !expanded;
     });
   }
 
   function arrangeMenu() {
     if (drawer.open) drawer.close();
-    const wide = desktop.matches;
+    const wide = desktopMenu();
     menu.toggleAttribute('data-desktop', wide);
     drawerToggle.hidden = wide;
     bar.hidden = !wide;
@@ -59,7 +51,7 @@
     const { button, group, submenu } = category;
     button.addEventListener('click', () => selectCategory(activeCategory === category ? null : category));
     group.addEventListener('pointerenter', (event) => {
-      if (!desktop.matches || event.pointerType !== 'mouse') return;
+      if (!desktopMenu() || event.pointerType !== 'mouse') return;
       if (activeCategory?.submenu.contains(document.activeElement)) return;
       selectCategory(category);
     });
@@ -84,5 +76,12 @@
   });
 
   desktop.addEventListener('change', arrangeMenu);
-  arrangeMenu();
+  function syncPreviewMode() {
+    if (window.frameElement && window.parent.devicePreview) {
+      document.documentElement.dataset.layoutMode = window.parent.devicePreview.mode;
+    }
+    arrangeMenu();
+  }
+  window.addEventListener('previewmodechange', syncPreviewMode);
+  syncPreviewMode();
 })();
