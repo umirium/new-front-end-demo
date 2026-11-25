@@ -12,6 +12,13 @@
     group: button.parentElement,
     submenu: document.getElementById(button.getAttribute('aria-controls')),
   }));
+  if (document.documentElement.hasAttribute('data-desktop-preview')) {
+    for (const link of document.querySelectorAll('a[href="../municipality-claude/index.html"], a[href="../top-codex-1/index.html"]')) {
+      const url = new URL(link.href);
+      url.searchParams.set('view', 'desktop');
+      link.href = url.href;
+    }
+  }
   let activeCategory = null;
 
   function selectCategory(active) {
