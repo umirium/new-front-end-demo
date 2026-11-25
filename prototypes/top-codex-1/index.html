@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>
+    if (new URLSearchParams(location.search).get('view') === 'desktop') {
+      document.querySelector('meta[name="viewport"]').content = 'width=1280, viewport-fit=cover';
+      document.documentElement.dataset.desktopPreview = '';
+    }
+  </script>
+  <title>返礼品を選ぶ｜ふるさと納税</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.5"></script>
+  <style type="text/tailwindcss">
+    @theme inline {
+      --font-sans: "BIZ UDPGothic", "Hiragino Kaku Gothic ProN", system-ui, sans-serif;
+      --font-serif: "Noto Serif JP", Georgia, serif;
+      --color-brand-soft: color-mix(in srgb, var(--brand) 13%, #faf7f0);
+      --color-brand-ink: color-mix(in srgb, var(--brand) 42%, #000);
+      --color-brand-rule: color-mix(in srgb, var(--brand) 68%, #867a6a);
+      --color-paper: color-mix(in srgb, var(--brand) 8%, #fffdf8);
+      --color-ink: color-mix(in srgb, var(--brand) 20%, #242323);
+      --color-muted: color-mix(in srgb, var(--brand) 24%, #454545);
+      --color-rule: color-mix(in srgb, var(--brand) 25%, #eeeae4);
+    }
+  </style>
+  <style>
+    :root { --brand: #7a5230; }
+    [hidden] { display: none !important; }
+    :focus-visible {
+      outline: 2px solid color-mix(in srgb, var(--brand) 42%, #000);
+      outline-offset: 3px;
+    }
+    :root {
+      --card-surface: color-mix(in srgb, var(--brand) 4%, white);
+      --accent-ink: color-mix(in srgb, var(--brand) 70%, #171717);
+    }
+    header { background-color: white; }
+    .choice { background-color: var(--card-surface); }
+    #gifts-title, [data-product-name], [data-amount] { color: var(--accent-ink); }
+    footer { background: color-mix(in srgb, var(--brand) 12%, #fffdf8); }
+    .choice { transition: background-color 360ms ease; }
+    .choice:hover { background-color: color-mix(in srgb, var(--brand) 10%, #faf7f0); }
+    a { text-decoration: none; }
+    .menu-control {
+      border-radius: .625rem;
+      transition: background-color 360ms ease, color 360ms ease;
+    }
+    .menu-control:is(:hover, [aria-expanded="true"]) {
+      background: color-mix(in srgb, var(--brand) 10%, #faf7f0);
+    }
+    .header-row {
+      --header-logo-height: 42px;
+      --header-icon-size: 28px;
+      --header-target-size: 44px;
+      --header-action-gap: 0px;
+      --header-side: calc(2 * var(--header-target-size) + var(--header-action-gap));
+      display: grid;
+      grid-template-columns: var(--header-side) minmax(0, 1fr) var(--header-side);
+      align-items: center;
+      column-gap: 4px;
+      min-height: calc(var(--header-logo-height) + 16px);
+    }
+    .header-logo { grid-column: 2; justify-self: center; min-width: 0; max-width: 100%; text-align: center; }
+    .header-logo img { width: auto; height: auto; max-width: 100%; max-height: var(--header-logo-height); }
+    .header-actions { grid-column: 3; justify-self: end; display: flex; gap: var(--header-action-gap); }
+    .header-action { width: var(--header-target-size); height: var(--header-target-size); }
+    .header-action svg {
+      width: var(--header-icon-size);
+      height: var(--header-icon-size);
+      overflow: visible;
+    }
+    .login-board { opacity: 0; transform: translate(16.65px, 16.47px); }
+    .login-board ~ circle { fill: white; }
+    .login-board text {
+      font-family: "Hiragino Kaku Gothic ProN", "BIZ UDPGothic", "Yu Gothic", sans-serif;
+      font-weight: 900;
+      stroke: currentColor;
+      stroke-width: .32;
+      paint-order: stroke fill;
+    }
+    .account-signed-in .login-board { display: none; }
+    @media (prefers-reduced-motion: no-preference) {
+      [data-account-link][data-animating]:not(.account-signed-in) .login-board {
+        animation: wave-board 2.6s ease-in-out;
+      }
+    }
+    /* ボードを握る位置を wave-hand の各姿勢の手先に合わせる。 */
+    @keyframes wave-board {
+      0%, 16%, 91%, 100% { opacity: 0; }
+      22%, 52%, 82% { opacity: 1; transform: translate(20.1px, 4px) rotate(-4deg); }
+      37%, 67% { opacity: 1; transform: translate(23.8px, 6.9px) rotate(6deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [data-account-link]:not(.account-signed-in):is(:hover, :focus-visible) .login-board {
+        opacity: 1;
+        transform: translate(20.1px, 4px);
+      }
+      [data-account-link]:not(.account-signed-in):is(:hover, :focus-visible) .header-wave-arm {
+        d: path("M3.5 21 C3.7 16.7 6.6 13.4 10.8 13.4 C13.5 13.4 15.3 14.2 16.7 12.1 C18 10.4 18.6 8.5 18.4 6.4 C18.3 4.6 19.1 3.9 20.1 4 C21.2 4.1 21.8 5.1 21.8 6.6 C21.9 11.2 20.5 14.2 17.3 17.1");
+      }
+    }
+    [data-account-link] { position: relative; }
+    .account-mark {
+      position: absolute;
+      inset: 0;
+      width: var(--header-icon-size);
+      height: var(--header-icon-size);
+      margin: auto;
+    }
+    .account-mark > [data-icon], .account-mark svg { display: block; }
+    [data-cart-link].has-items :is(.header-cart-parcel, .header-cart-badge) { display: inline; }
+    .header-cart-body { transform-origin: 12px 20px; }
+    @media (prefers-reduced-motion: no-preference) {
+      .header-action[data-animating] .header-wave-arm {
+        animation: wave-hand 2.6s ease-in-out;
+      }
+      .header-action[data-animating] .header-cart-body {
+        animation: roll-cart 2.6s ease-in-out;
+      }
+      .header-action[data-animating] .header-cart-trail {
+        animation: cart-trail 2.6s ease-in-out;
+      }
+    }
+    @keyframes wave-hand {
+      22%, 52%, 82% {
+        d: path("M3.5 21 C3.7 16.7 6.6 13.4 10.8 13.4 C13.5 13.4 15.3 14.2 16.7 12.1 C18 10.4 18.6 8.5 18.4 6.4 C18.3 4.6 19.1 3.9 20.1 4 C21.2 4.1 21.8 5.1 21.8 6.6 C21.9 11.2 20.5 14.2 17.3 17.1");
+      }
+      37%, 67% {
+        d: path("M3.5 21 C3.7 16.7 6.6 13.4 10.8 13.4 C13.5 13.4 15.3 14.1 17.3 12.7 C19.1 11.5 20.1 9.9 21.2 8 C22 6.5 23 6.3 23.8 6.9 C24.7 7.6 24.6 8.8 23.9 10.1 C22.3 13.4 20.2 15.8 17.3 17.1");
+      }
+    }
+    @keyframes roll-cart {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      56% { transform: translateX(5px) rotate(-3deg); }
+    }
+    @keyframes cart-trail {
+      0%, 100% { opacity: 0; transform: translateX(1px); }
+      49% { opacity: .85; transform: translateX(-1px); }
+    }
+    @media (min-width: 48rem) {
+      .header-row {
+        --header-logo-height: 54px;
+        --header-icon-size: 30px;
+        --header-target-size: 52px;
+        --header-action-gap: 6px;
+      }
+    }
+    html:has(#site-menu[data-desktop]) {
+      .header-row {
+        --header-logo-height: 68px;
+        --header-icon-size: 34px;
+        --header-target-size: 56px;
+        --header-action-gap: 8px;
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+      header { border-bottom-width: 0; }
+      [data-menu-bar] { background: color-mix(in srgb, var(--brand) 16%, #faf7f0); }
+      .header-logo { grid-column: 1; justify-self: start; text-align: start; }
+      .header-actions { grid-column: 2; }
+    }
+    #menu-drawer {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: min(22rem, 88vw);
+      max-width: none;
+      border-radius: 0 1rem 1rem 0;
+      height: 100dvh;
+      max-height: none;
+      padding-bottom: env(safe-area-inset-bottom);
+      transform: translateX(-100%);
+      transition: transform 240ms ease, display 240ms allow-discrete, overlay 240ms allow-discrete;
+    }
+    #menu-drawer[open] { transform: translateX(0); }
+    #menu-drawer::backdrop {
+      background: transparent;
+      transition: background-color 240ms ease, display 240ms allow-discrete, overlay 240ms allow-discrete;
+    }
+    #menu-drawer[open]::backdrop { background: rgb(34 26 18 / 45%); }
+    @starting-style {
+      #menu-drawer[open] { transform: translateX(-100%); }
+      #menu-drawer[open]::backdrop { background: transparent; }
+    }
+    html:has(#menu-drawer[open]) { overflow: hidden; }
+
+    #site-menu[data-desktop] .menu-groups { display: flex; align-items: stretch; gap: .5rem; }
+    #site-menu[data-desktop] .menu-group { position: relative; }
+    #site-menu[data-desktop] .menu-submenu {
+      position: absolute;
+      inset: 100% auto auto 0;
+      z-index: 10;
+      width: max-content;
+      min-width: 14rem;
+      max-width: 25rem;
+      max-height: 65dvh;
+      overflow-y: auto;
+      padding: .375rem;
+      border-radius: .875rem;
+      background: var(--card-surface);
+      box-shadow: 0 8px 20px rgb(34 26 18 / 12%);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-.3rem);
+      transition: opacity 160ms ease, transform 160ms ease, visibility 160ms;
+    }
+    #site-menu[data-desktop] [aria-expanded="true"] + .menu-submenu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .menu-chevron { transform: rotate(90deg); transition: transform 160ms ease; }
+    [aria-expanded="true"] > .menu-chevron { transform: rotate(-90deg); }
+    @media (prefers-reduced-motion: reduce) {
+      #menu-drawer, #menu-drawer::backdrop, .choice, .menu-control, .menu-chevron, #site-menu[data-desktop] .menu-submenu {
+        transition: none;
+      }
+    }
+    [data-proto-toolbar] {
+      max-width: calc(100% - 24px);
+      flex-wrap: wrap;
+    }
+    [data-drag-handle] { cursor: grab; touch-action: none; user-select: none; padding: 0 5px; font-size: 22px; }
+    [data-drag-handle]:active { cursor: grabbing; }
+    [data-proto-swatch][aria-pressed="true"] { outline: 2px solid white; outline-offset: 1px; }
+    body:has([data-proto-toolbar]) footer { padding-bottom: 5rem; }
+    #menu-drawer .menu-groups { padding: 1rem; }
+    #site-menu [aria-current="page"] { background: color-mix(in srgb, var(--brand) 50%, #242323); color: white; }
+    #site-menu[data-desktop] [aria-current="page"] {
+      background: color-mix(in srgb, var(--brand) 8%, white);
+      color: var(--accent-ink);
+    }
+    #site-menu[data-desktop] [aria-current="page"] [data-icon="check"] { display: none; }
+    #menu-drawer [aria-current="page"] { justify-content: space-between; }
+    #menu-drawer .menu-group { margin-top: 1.25rem; }
+    #menu-drawer [data-category-label] { margin: 0 0 .4rem; padding: 0; border: 0; color: var(--accent-ink); }
+    #menu-drawer .menu-submenu { background: var(--card-surface); border: 1px solid color-mix(in srgb,var(--brand) 25%,white); border-radius: .75rem; }
+    #menu-drawer .menu-submenu li + li { border-top: 1px solid color-mix(in srgb,var(--brand) 17%,white); }
+    #menu-drawer .menu-submenu a { justify-content: space-between; gap: .5rem; }
+    #menu-drawer .menu-submenu a::after { content: ""; width: .5rem; height: .5rem; flex: none; border: solid currentColor; border-width: 1.5px 1.5px 0 0; transform: rotate(45deg); }
+    [data-proto-toolbar] :focus-visible { outline-color: #fff; }
+  </style>
+  <script src="../shared/data.js" defer></script>
+  <script src="../shared/icons.js" defer></script>
+  <script src="./navigation.js" defer></script>
+  <script src="./prototype.js" defer></script>
+  <script src="../shared/proto-toolbar.js" defer></script>
+  <link rel="stylesheet" href="../shared/preview-settings.css">
+</head>
+<body data-draggable-toolbar class="bg-paper font-sans text-lg leading-relaxed text-ink antialiased">
+  <a href="#gifts" class="sr-only rounded bg-white px-4 py-3 focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-10">返礼品一覧へ移動</a>
+  <header class="border-y border-t-[3px] border-t-brand-rule border-b-rule bg-white">
+    <div class="header-row mx-auto max-w-6xl px-2 py-4 sm:px-8 sm:py-5">
+      <button type="button" data-menu-toggle aria-label="メニュー" aria-controls="menu-drawer" aria-haspopup="dialog" aria-expanded="false" class="menu-control col-start-1 grid size-[52px] place-items-center rounded-lg text-brand-ink" hidden>
+        <span data-icon="menu" data-icon-size="size-[28px]"></span>
+      </button>
+      <div class="header-logo">
+        <img data-store-logo alt="" hidden>
+        <span data-store-name class="block text-lg font-bold wrap-anywhere"></span>
+      </div>
+      <div class="header-actions">
+        <a href="../../demo-scope.html" data-account-link aria-label="ログイン" title="ログイン" class="header-action grid place-items-center rounded-lg text-brand-ink">
+          <span class="account-mark"><span data-icon="userWaveBoard"></span></span>
+        </a>
+        <a href="../../demo-scope.html" data-cart-link aria-label="カート（商品なし）" class="header-action grid place-items-center rounded-lg text-brand-ink">
+          <span data-icon="cartRoll"></span>
+        </a>
+      </div>
+    </div>
+    <div data-menu-bar class="bg-paper">
+      <nav id="site-menu" aria-label="メインメニュー">
+        <ul class="menu-groups mx-auto max-w-6xl py-1 px-3 sm:px-7">
+          <li><span aria-current="page" class="flex min-h-13 items-center gap-3 rounded-lg px-4 py-2 text-lg font-bold">返礼品一覧<span data-icon="check" data-icon-size="size-5" aria-hidden="true"></span></span></li>
+          <li class="menu-group">
+            <p data-category-label class="mx-2 border-t border-rule pt-3 pb-1 font-serif text-lg font-bold text-brand-ink">ふるさと納税とは？</p>
+            <button type="button" data-category-toggle aria-expanded="false" aria-controls="tax-menu" class="menu-control flex min-h-13 items-center gap-1.5 px-3 text-lg font-semibold text-brand-ink" hidden>ふるさと納税とは？<span class="menu-chevron" data-icon="chevronRight"></span></button>
+            <ul id="tax-menu" class="menu-submenu">
+              <li><a href="../../demo-scope.html" class="menu-control flex min-h-13 items-center px-4 py-2 text-lg text-brand-ink">ふるさと納税とは？</a></li>
+              <li><a href="../../demo-scope.html" class="menu-control flex min-h-13 items-center px-4 py-2 text-lg text-brand-ink">ワンストップ特例制度について</a></li>
+              <li><a href="../../demo-scope.html" class="menu-control flex min-h-13 items-center px-4 py-2 text-lg text-brand-ink">寄附金の使い道</a></li>
+              <li><a href="https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/furusato/mechanism/deduction.html#block02" target="_blank" rel="noopener" class="menu-control flex min-h-13 items-center px-4 py-2 text-lg text-brand-ink">寄附金控除額シミュレーション（外部サイト）</a></li>
+            </ul>
+          </li>
+          <li class="menu-group">
+            <p data-category-label class="mx-2 border-t border-rule pt-3 pb-1 font-serif text-lg font-bold text-brand-ink">ガイド・その他</p>
+            <button type="button" data-category-toggle aria-expanded="false" aria-controls="guide-menu" class="menu-control flex min-h-13 items-center gap-1.5 px-3 text-lg font-semibold text-brand-ink" hidden>ガイド・その他<span class="menu-chevron" data-icon="chevronRight"></span></button>
+            <ul id="guide-menu" class="menu-submenu">
+              <li><a href="../../demo-scope.html" class="menu-control flex min-h-13 items-center px-4 py-2 text-lg text-brand-ink">ご利用ガイド</a></li>
+              <li><a href="../../demo-scope.html" data-menu-store-label="について" class="menu-control flex min-h-13 items-center px-4 py-2 text-lg text-brand-ink">京都府京都市ふるさと納税について</a></li>
+              <li><a href="../../demo-scope.html" class="menu-control flex min-h-13 items-center px-4 py-2 text-lg text-brand-ink">個人情報取り扱いについて</a></li>
+              <li><a href="../../demo-scope.html" data-menu-store-label="" class="menu-control flex min-h-13 items-center px-4 py-2 text-lg text-brand-ink">京都府京都市ふるさと納税</a></li>
+              <li><a href="../../demo-scope.html" class="menu-control flex min-h-13 items-center px-4 py-2 text-lg text-brand-ink">特定商取引法に基づく表記</a></li>
+              <li><a href="../../demo-scope.html" class="menu-control flex min-h-13 items-center px-4 py-2 text-lg text-brand-ink">お問合せ</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <dialog id="menu-drawer" aria-labelledby="menu-title" class="overflow-y-auto bg-paper text-ink shadow-xl">
+    <div class="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-rule bg-paper px-4 py-2">
+      <h2 id="menu-title" class="font-serif text-xl font-bold">メニュー</h2>
+      <button type="button" data-menu-close autofocus class="menu-control inline-flex min-h-13 items-center justify-center gap-1.5 rounded-sm px-2 text-lg text-brand-ink"><span data-icon="close"></span>閉じる</button>
+    </div>
+  </dialog>
+
+  <main class="mx-auto max-w-6xl px-4 pt-5 pb-10 sm:px-8 sm:pt-7 sm:pb-14">
+    <section id="gifts" aria-labelledby="gifts-title" tabindex="-1" class="scroll-mt-4">
+      <h1 id="gifts-title" class="mb-4 font-serif text-2xl leading-snug font-bold sm:text-3xl">返礼品一覧</h1>
+      <p data-product-count role="status" class="sr-only"></p>
+      <form data-filters class="mb-4 grid gap-2 border-b border-rule pb-3 sm:grid-cols-2 sm:gap-4" role="search" aria-label="返礼品を絞り込む" hidden>
+        <label class="min-w-0 text-lg font-semibold">返礼品名
+          <input data-search type="search" placeholder="返礼品名で検索" class="mt-1 block min-h-13 w-full rounded-md border border-muted bg-white px-3 text-lg font-normal">
+        </label>
+        <label class="min-w-0 text-lg font-semibold">寄附金額
+          <select data-budget class="mt-1 block min-h-13 w-full rounded-md border border-muted bg-white px-3 font-normal">
+            <option value="all">すべて</option>
+            <option value="low">30,000円以下</option>
+            <option value="middle">30,000円超〜100,000円以下</option>
+            <option value="high">100,000円超</option>
+          </select>
+        </label>
+      </form>
+      <ul data-product-list role="list" class="grid gap-x-8 gap-y-7 md:grid-cols-2 min-[62rem]:grid-cols-3" hidden></ul>
+      <p data-empty class="border-b border-rule py-5 text-lg text-muted" hidden></p>
+      <noscript><p class="mt-3 text-lg">試作の返礼品を表示するには、JavaScript を有効にしてください。</p></noscript>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-rule px-4 py-5 text-center text-base leading-relaxed text-muted">
+    <p data-powered-by></p>
+  </footer>
+
+  <template id="product-card">
+    <li data-product class="min-w-0">
+      <a data-product-link class="choice flex h-full flex-col rounded-2xl border border-rule bg-white p-4 sm:p-5">
+        <div class="relative grid aspect-2/1 place-items-center overflow-hidden rounded-lg bg-white text-brand-ink">
+          <span class="grid place-items-center" data-icon="ticket"></span>
+          <img data-product-image alt="" loading="lazy" decoding="async" class="invisible absolute inset-0 size-full bg-white object-contain" hidden>
+        </div>
+        <div class="flex grow flex-col gap-3 pt-4">
+          <div>
+            <h2 data-product-name class="text-xl leading-snug font-bold wrap-anywhere"></h2>
+            <p data-voucher class="mt-1 text-lg font-semibold text-muted" hidden>利用券 <span data-voucher-value></span>円分</p>
+          </div>
+          <div class="mt-auto flex flex-wrap items-baseline justify-end gap-x-2 gap-y-0.5 text-right">
+            <span class="text-base font-medium text-muted">寄附金額</span>
+            <span class="text-2xl leading-tight font-bold tabular-nums"><span data-amount></span><span class="ml-1 text-lg">円</span></span>
+          </div>
+        </div>
+      </a>
+    </li>
+  </template>
+  <button type="button" class="preview-toggle" aria-expanded="false" aria-controls="preview-settings" hidden>テーマ設定</button>
+  <div id="preview-settings" hidden><div class="preview-palette"></div></div>
+  <div data-account-preview-control hidden class="flex flex-wrap items-center gap-2">
+    <label class="flex items-center gap-1">
+    ログイン状態
+    <select data-account-state class="rounded bg-white px-1 py-1 text-black">
+      <option value="guest">ログイン前</option>
+      <option value="signed-in">ログイン後</option>
+    </select>
+    </label>
+    <label class="flex items-center gap-1">カートの中身
+      <select data-cart-state class="rounded bg-white px-1 py-1 text-black">
+        <option value="empty">商品なし</option>
+        <option value="filled">商品あり</option>
+      </select>
+    </label>
+  </div>
+  <script>
+    const control = document.querySelector('[data-account-preview-control]');
+    const accountState = control.querySelector('[data-account-state]');
+    const cartState = control.querySelector('[data-cart-state]');
+    const cartLink = document.querySelector('[data-cart-link]');
+    const accountLink = document.querySelector('[data-account-link]');
+    const loginPage = accountLink.href;
+
+    function renderAccount() {
+      const signedIn = accountState.value === 'signed-in';
+      accountLink.classList.toggle('account-signed-in', signedIn);
+      accountLink.href = signedIn ? '../../demo-scope.html' : loginPage;
+      accountLink.title = signedIn ? 'マイページ（ログイン中）' : 'ログイン';
+      accountLink.setAttribute('aria-label', accountLink.title);
+    }
+
+    accountState.value = new URLSearchParams(location.search).get('account') === 'signed-in' ? 'signed-in' : 'guest';
+    function renderCart() {
+      const hasItems = cartState.value === 'filled';
+      cartLink.classList.toggle('has-items', hasItems);
+      const count = hasItems ? 1 + Math.floor(Math.random() * 9) : 0;
+      const badge = cartLink.querySelector('[data-cart-count]');
+      badge.textContent = count || '';
+      cartLink.title = hasItems ? 'カート（商品' + count + '点）' : 'カート（商品なし）';
+      cartLink.setAttribute('aria-label', cartLink.title);
+    }
+
+    accountState.addEventListener('change', renderAccount);
+    cartState.addEventListener('change', renderCart);
+    renderAccount();
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCart();
+      document.querySelectorAll('[data-menu-store-label]').forEach((link) => {
+        link.textContent = window.PROTO_DATA.store.name + link.dataset.menuStoreLabel;
+      });
+    });
+  </script>
+</body>
+</html>

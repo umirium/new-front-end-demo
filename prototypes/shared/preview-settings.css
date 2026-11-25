@@ -1,0 +1,16 @@
+.preview-toggle { display: none; }
+#preview-settings, .preview-palette { display: contents; }
+@media (max-width: 47.99rem) {
+  [data-proto-toolbar] { border-radius: 1rem !important; max-height: calc(100dvh - 24px); overflow-y: auto; }
+  .preview-toggle { display: block; min-height: 40px; padding: 0 .6rem; font-size: 16px; font-weight: bold; }
+  .preview-toggle::after { content: "⌄"; margin-left: .5em; }
+  .preview-toggle[aria-expanded="true"]::after { content: "⌃"; }
+  .preview-toggle[aria-expanded="false"] + #preview-settings { display: none; }
+  #preview-settings { display: grid; flex-basis: 100%; gap: .75rem; padding: .3rem .5rem .6rem; font-size: 16px; }
+  .preview-palette { display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; gap: .3rem; }
+  .preview-palette > span { grid-column: 1 / -1; margin-bottom: .4rem; }
+  .preview-palette [data-proto-swatch] { width: 30px !important; height: 30px !important; }
+  #preview-settings [data-account-preview-control] { display: grid; gap: .5rem; }
+  #preview-settings label { justify-content: space-between; gap: 1rem; }
+  #preview-settings select { min-height: 40px; font-size: 16px; }
+}
